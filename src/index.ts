@@ -200,7 +200,7 @@ interface WhitespaceStripperOptions {
  * You can run other preprocessors first via the sequential
  * preprocessor like so
  * ```js
- * preprocess: sequentialPreprocessor(otherPreprocessors,svelteStripper())
+ * preprocess: sequentialPreprocessor(otherPreprocessors,stripWhitespace())
  * ```
  * *
  * @param passedOptions config options
