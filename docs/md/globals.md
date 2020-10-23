@@ -25,8 +25,6 @@
 
 ▸ **sequentialPreprocessor**(...`preprocessorLists`: (PreprocessorGroup \| PreprocessorGroup[])[]): PreprocessorGroup
 
-*Defined in [index.ts:493](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L493)*
-
 Runs the passed preprocessors lists in sequence.
 Meaning All `markup`, `script`, and `style` preprocessors
 of group 1 will run before any preprocessor of group 2.
@@ -45,16 +43,13 @@ ___
 
 ▸ **stripWhitespace**(`passedOptions?`: [WhitespaceStripperOptions](interfaces/whitespacestripperoptions.md)): PreprocessorGroup
 
-*Defined in [index.ts:209](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L209)*
-
 Strips unwanted whitespace out of svelte files.
 *Warning! Must be run on valid/pure svelte files!
 You can run other preprocessors first via the sequential
-preprocessor like so
+preprocessor like so*
 ```js
 preprocess: sequentialPreprocessor(otherPreprocessors,stripWhitespace())
 ```
-*
 
 #### Parameters:
 

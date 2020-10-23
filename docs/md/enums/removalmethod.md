@@ -19,15 +19,11 @@ How we dispose of unwanted whitespace
 
 •  **Comment**:  = "comment"
 
-*Defined in [index.ts:118](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L118)*
-
 ___
 
 ### Strip
 
 •  **Strip**:  = "strip"
-
-*Defined in [index.ts:100](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L100)*
 
 Remove the whitespace from the markup.
 Turns

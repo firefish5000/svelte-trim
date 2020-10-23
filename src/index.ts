@@ -198,11 +198,10 @@ interface WhitespaceStripperOptions {
  * Strips unwanted whitespace out of svelte files.
  * *Warning! Must be run on valid/pure svelte files!
  * You can run other preprocessors first via the sequential
- * preprocessor like so
+ * preprocessor like so*
  * ```js
  * preprocess: sequentialPreprocessor(otherPreprocessors,stripWhitespace())
  * ```
- * *
  * @param passedOptions config options
  */
 
@@ -287,11 +286,13 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
             return
           }
 
+          // Ignore custom. (could be used to ignore elements containing some attribute)
           if (options.ignoreFilter(node ,parent ,prop ,index ,ancestors)) {
             this.skip()
             return
           }
 
+          // TODO: Add a option to match container's tags. Currently treated the same as siblings.
           const hasParent = parent != null
           const parentIsBlock = blockTypes.includes(parent?.type as BlockTypes['type'])
           const parentIsElement = parent?.type === 'Element'
@@ -328,7 +329,7 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
           const nextSiblingIsText = nextSibling?.type === 'Text'
           const prevSiblingIsText = prevSibling?.type === 'Text'
 
-          // Fix broken ast
+          // Fix broken ast. Puts all whitespace
           if (isNodeType<BlockTypes>(node ,blockTypes) && 'children' in node) {
             const openingTag = content.slice(node.start ,node.children?.[0]?.start ?? node.end)
             const closingTag = content.slice(node.children[node.children.length - 1]?.end ?? node.start ,node.end)
@@ -378,62 +379,58 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
             }
           }
           // Trim whitespace
+          const inlineSpace = ' \f\t'
+          const linebreakSpace = '\r\n'
+          // FIXME: Dont include nonbreaking space. (is there a reason we type this instead of html escape)
+          // const nonSpace = '\S'
+          // FIXME: Option to Trim spaces inside of Text, such as those adjacent to nonbreaking whitespace
+          // const nonbreakingWhitespace = '[]'
           if (node.type === 'Text') {
+            const trimLeadingEnabled = (prevSiblingIsMustacheTag && options.mustacheTextSiblings)
+            || (prevSiblingIsElement && options.elementSiblings)
+            || (prevSiblingIsComponent && options.componentSiblings)
+            || (prevSiblingIsBlock && options.mustacheBlockSiblings)
+            || (prevSiblingIsDirectiveTag && options.mustacheDirectiveSiblings)
+            const trimTrailingEnabled = (nextSiblingIsMustacheTag && options.mustacheTextSiblings)
+            || (nextSiblingIsElement && options.elementSiblings)
+            || (nextSiblingIsComponent && options.componentSiblings)
+            || (nextSiblingIsBlock && options.mustacheBlockSiblings)
+            || (nextSiblingIsDirectiveTag && options.mustacheDirectiveSiblings)
             //  Detect if sibling element type and trim appropriately
-            if (
-              // Check if we operate on this node sequence
-              (
-                (prevSiblingIsMustacheTag && options.mustacheTextSiblings)
-                || (prevSiblingIsElement && options.elementSiblings)
-                || (prevSiblingIsComponent && options.componentSiblings)
-                || (prevSiblingIsBlock && options.mustacheBlockSiblings)
-                || (prevSiblingIsDirectiveTag && options.mustacheDirectiveSiblings)
-              )
-            // Check if we operate on this text sequence
-            && (
+            if (trimLeadingEnabled && (
               // @ts-expect-error `raw` property is missing from interface
-              (options.multiline && /^\s*\n/.test(node.raw))
+              (options.multiline && RegExp(`^[${inlineSpace}]*[${linebreakSpace}]`).test(node.raw))
               // @ts-expect-error `raw` property is missing from interface
-              || (options.inline && /^[ \t]+(?:[^\n]|$)/.test(node.raw))
-            )
-            ) {
+              || (options.inline && RegExp(`^[${inlineSpace}]+(?:[^${linebreakSpace}]|$)`).test(node.raw))
+            )) {
+              const leadingSpaceRE = RegExp(`^([${inlineSpace}${linebreakSpace}]*)`)
               if (options.removalMethod === 'strip') {
                 // @ts-expect-error `raw` property is missing from interface
-                node.raw = (node.raw as string).trimStart()
+                node.raw = (node.raw as string).replace(leadingSpaceRE ,'')
               }
               else if (options.removalMethod === 'comment') {
                 // @ts-expect-error `raw` property is missing from interface
-                node.raw = (node.raw as string).replace(/^(\s*)/ ,'<!--$1-->')
+                node.raw = (node.raw as string).replace(leadingSpaceRE ,'<!--$1-->')
               }
               else {
                 throw new Error(`Failed to handel removalMethod: ${JSON.stringify(options.removalMethod)}`)
               }
               trimmings.add(node)
             }
-            if (
-              // Check if we operate on this node sequence
-              (
-                (nextSiblingIsMustacheTag && options.mustacheTextSiblings)
-                || (nextSiblingIsElement && options.elementSiblings)
-                || (nextSiblingIsComponent && options.componentSiblings)
-                || (nextSiblingIsBlock && options.mustacheBlockSiblings)
-                || (nextSiblingIsDirectiveTag && options.mustacheDirectiveSiblings)
-              )
-            // Check if we operate on this text sequence
-            && (
+            if (trimTrailingEnabled && (
               // @ts-expect-error `raw` property is missing from interface
-              (options.multiline && /\n\s*$/.test(node.raw))
+              (options.multiline && RegExp(`[${linebreakSpace}][${inlineSpace}]*$`).test(node.raw))
               // @ts-expect-error `raw` property is missing from interface
-              || (options.inline && /(?:^|[^\n])[ \t]+$/.test(node.raw))
-            )
-            ) {
+              || (options.inline && RegExp(`(?:^|[^${linebreakSpace}])[${inlineSpace}]+$`).test(node.raw))
+            )) {
+              const trailingSpaceRE = RegExp(`([${inlineSpace}${linebreakSpace}]*)$`)
               if (options.removalMethod === RemovalMethod.Strip) {
                 // @ts-expect-error `raw` property is missing from interface
-                node.raw = (node.raw as string).trimEnd()
+                node.raw = (node.raw as string).replace(trailingSpaceRE ,'')
               }
               else if (options.removalMethod === RemovalMethod.Comment) {
                 // @ts-expect-error `raw` property is missing from interface
-                node.raw = (node.raw as string).replace(/(\s*)$/ ,'<!--$1-->')
+                node.raw = (node.raw as string).replace(trailingSpaceRE ,'<!--$1-->')
               }
               else {
                 throw new Error(`Failed to handel removalMethod: ${JSON.stringify(options.removalMethod)}`)
@@ -441,8 +438,7 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
               trimmings.add(node)
             }
           }
-
-          // Process mustaches
+          // Ensure new mustache syntax hasn't been added/used
           else if (node.type === 'MustacheTag') {
             // handled
           }
@@ -458,11 +454,8 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
           ancestors.push(node)
         }
         ,leave(node) {
-          /* if (!ancestors.has(node)) {
-            throw new Error('Svelte Stripper attempted to leave a node not in the ancestor list!')
-          } */
           if (ancestors.length < 1) {
-            throw new Error('Svelte Stripper attempted to leave a node not in the ancestor list!')
+            throw new Error('Attempted to leave a node not in the ancestor list!')
           }
           ancestors.pop()
         }
@@ -472,12 +465,6 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
         // @ts-expect-error `raw` property is missing from interface
         newCode = spliceSlice(newCode ,node.start ,node.end - node.start ,node.raw)
       }
-      /* console.log(newCode)
-      console.log(filename)
-      console.log('V open ansc')
-      console.log(ancestors)
-      console.log('^ open ansc')
-      //process.exit(1) */
       return { code: newCode }
     }
   }

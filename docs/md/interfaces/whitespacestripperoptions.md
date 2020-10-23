@@ -35,8 +35,6 @@ by an option with html comments
 
 • `Optional` **componentSiblings**: undefined \| false \| true
 
-*Defined in [index.ts:163](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L163)*
-
 Trims text adjacent to components (such as `<Component>` and `<svelte:component>`).
 
 ___
@@ -45,8 +43,6 @@ ___
 
 • `Optional` **elementSiblings**: undefined \| false \| true
 
-*Defined in [index.ts:161](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L161)*
-
 Trims text adjacent to elements (such as `<span>` or `<div>`).
 
 ___
@@ -54,8 +50,6 @@ ___
 ### ignoreElements
 
 • `Optional` **ignoreElements**: string[]
-
-*Defined in [index.ts:188](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L188)*
 
 Ignore text contained within the specified dom nodes.
 Note that top level style/script tags are
@@ -68,8 +62,6 @@ ___
 
 • `Optional` **ignoreFilter**: undefined \| (node: INode, parent: INode \| undefined, prop: string \| undefined, index: number, ancestors: INode[]) => boolean
 
-*Defined in [index.ts:194](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L194)*
-
 Ignore text contained within the svelte ast nodes
 that match the filter.
 Matches nothing by default.
@@ -79,8 +71,6 @@ ___
 ### inline
 
 • `Optional` **inline**: undefined \| false \| true
-
-*Defined in [index.ts:141](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L141)*
 
 Trims text adjacent to other elements/mustaches without a newline.
 Turns
@@ -97,8 +87,6 @@ ___
 ### multiline
 
 • `Optional` **multiline**: undefined \| false \| true
-
-*Defined in [index.ts:159](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L159)*
 
 Trims text adjacent to other elements/mustaches when a newline is present.
 Turn
@@ -122,8 +110,6 @@ ___
 
 • `Optional` **mustacheBlockSiblings**: undefined \| false \| true
 
-*Defined in [index.ts:175](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L175)*
-
 Trims text adjacent to mustache blocks
 (such as `{#if boolean}{:else}{/if}`).
 Defaults to true.
@@ -133,8 +119,6 @@ ___
 ### mustacheDirectiveSiblings
 
 • `Optional` **mustacheDirectiveSiblings**: undefined \| false \| true
-
-*Defined in [index.ts:181](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L181)*
 
 Trims text adjacent to mustache @ directives
 (such as `{@html '<br/>'}{@debug someVar}`).
@@ -146,8 +130,6 @@ ___
 
 • `Optional` **mustacheTextSiblings**: undefined \| false \| true
 
-*Defined in [index.ts:169](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L169)*
-
 Trims text adjacent to mustache text expressions
 (such as `{someVar}`).
 Defaults to false, treating it the same way as the escaped text content would have been.
@@ -157,7 +139,5 @@ ___
 ### removalMethod
 
 • `Optional` **removalMethod**: [RemovalMethod](../enums/removalmethod.md)
-
-*Defined in [index.ts:129](https://github.com/firefish5000/svelte-strip-whitespace/blob/ae44fdc/src/index.ts#L129)*
 
 How we should dispose of unwanted whitespace

@@ -14,7 +14,7 @@
     "preprocess": "run-s clean:preprocessed preprocess:typescript",
     "preprocess:typescript": "tsc",
     "docs": "run-p docs:md",
-    "docs:md": "typedoc --out docs/md --plugin typedoc-plugin-markdown src --excludeNotExported --excludeExternals --excludePrivate --mode file --excludeNotDocumented",
+    "docs:md": "typedoc --out docs/md --plugin typedoc-plugin-markdown src --excludeNotExported --excludeExternals --excludePrivate --mode file --excludeNotDocumented --hideGenerator --disableSources",
     "prepare": "npm run build"
   },
   "keywords": [
