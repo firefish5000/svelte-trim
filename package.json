@@ -1,5 +1,5 @@
 {
-  "name": "svelte-stripper",
+  "name": "svelte-strip-whitespace",
   "version": "0.0.1",
   "description": "Removes unwanted whitespace from the markup section of svelte files.",
   "main": "out/index.js",
