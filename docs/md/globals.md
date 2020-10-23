@@ -1,8 +1,8 @@
-**[svelte-stripper](README.md)**
+**[svelte-strip-whitespace](README.md)**
 
 > Globals
 
-# svelte-stripper
+# svelte-strip-whitespace
 
 ## Index
 
@@ -12,12 +12,12 @@
 
 ### Interfaces
 
-* [SvelteStripperOptions](interfaces/sveltestripperoptions.md)
+* [WhitespaceStripperOptions](interfaces/whitespacestripperoptions.md)
 
 ### Functions
 
 * [sequentialPreprocessor](globals.md#sequentialpreprocessor)
-* [svelteStripper](globals.md#sveltestripper)
+* [stripWhitespace](globals.md#stripwhitespace)
 
 ## Functions
 
@@ -25,7 +25,7 @@
 
 ▸ **sequentialPreprocessor**(...`preprocessorLists`: (PreprocessorGroup \| PreprocessorGroup[])[]): PreprocessorGroup
 
-*Defined in index.ts:493*
+*Defined in [index.ts:493](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L493)*
 
 Runs the passed preprocessors lists in sequence.
 Meaning All `markup`, `script`, and `style` preprocessors
@@ -41,11 +41,11 @@ Name | Type | Description |
 
 ___
 
-### svelteStripper
+### stripWhitespace
 
-▸ **svelteStripper**(`passedOptions?`: [SvelteStripperOptions](interfaces/sveltestripperoptions.md)): PreprocessorGroup
+▸ **stripWhitespace**(`passedOptions?`: [WhitespaceStripperOptions](interfaces/whitespacestripperoptions.md)): PreprocessorGroup
 
-*Defined in index.ts:209*
+*Defined in [index.ts:209](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L209)*
 
 Strips unwanted whitespace out of svelte files.
 *Warning! Must be run on valid/pure svelte files!
@@ -60,7 +60,7 @@ preprocess: sequentialPreprocessor(otherPreprocessors,svelteStripper())
 
 Name | Type | Default value | Description |
 ------ | ------ | ------ | ------ |
-`passedOptions` | [SvelteStripperOptions](interfaces/sveltestripperoptions.md) | {
+`passedOptions` | [WhitespaceStripperOptions](interfaces/whitespacestripperoptions.md) | {
   removalMethod: RemovalMethod.Strip
   ,inline: false
   ,multiline: true

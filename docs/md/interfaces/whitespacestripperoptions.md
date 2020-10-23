@@ -1,8 +1,8 @@
-**[svelte-stripper](../README.md)**
+**[svelte-strip-whitespace](../README.md)**
 
-> [Globals](../globals.md) / SvelteStripperOptions
+> [Globals](../globals.md) / WhitespaceStripperOptions
 
-# Interface: SvelteStripperOptions
+# Interface: WhitespaceStripperOptions
 
 Configures the preprocessor.
 For ease of reading, this doc
@@ -12,22 +12,22 @@ by an option with html comments
 
 ## Hierarchy
 
-* **SvelteStripperOptions**
+* **WhitespaceStripperOptions**
 
 ## Index
 
 ### Properties
 
-* [componentSiblings](sveltestripperoptions.md#componentsiblings)
-* [elementSiblings](sveltestripperoptions.md#elementsiblings)
-* [ignoreElements](sveltestripperoptions.md#ignoreelements)
-* [ignoreFilter](sveltestripperoptions.md#ignorefilter)
-* [inline](sveltestripperoptions.md#inline)
-* [multiline](sveltestripperoptions.md#multiline)
-* [mustacheBlockSiblings](sveltestripperoptions.md#mustacheblocksiblings)
-* [mustacheDirectiveSiblings](sveltestripperoptions.md#mustachedirectivesiblings)
-* [mustacheTextSiblings](sveltestripperoptions.md#mustachetextsiblings)
-* [removalMethod](sveltestripperoptions.md#removalmethod)
+* [componentSiblings](whitespacestripperoptions.md#componentsiblings)
+* [elementSiblings](whitespacestripperoptions.md#elementsiblings)
+* [ignoreElements](whitespacestripperoptions.md#ignoreelements)
+* [ignoreFilter](whitespacestripperoptions.md#ignorefilter)
+* [inline](whitespacestripperoptions.md#inline)
+* [multiline](whitespacestripperoptions.md#multiline)
+* [mustacheBlockSiblings](whitespacestripperoptions.md#mustacheblocksiblings)
+* [mustacheDirectiveSiblings](whitespacestripperoptions.md#mustachedirectivesiblings)
+* [mustacheTextSiblings](whitespacestripperoptions.md#mustachetextsiblings)
+* [removalMethod](whitespacestripperoptions.md#removalmethod)
 
 ## Properties
 
@@ -35,7 +35,7 @@ by an option with html comments
 
 • `Optional` **componentSiblings**: undefined \| false \| true
 
-*Defined in index.ts:163*
+*Defined in [index.ts:163](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L163)*
 
 Trims text adjacent to components (such as `<Component>` and `<svelte:component>`).
 
@@ -45,7 +45,7 @@ ___
 
 • `Optional` **elementSiblings**: undefined \| false \| true
 
-*Defined in index.ts:161*
+*Defined in [index.ts:161](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L161)*
 
 Trims text adjacent to elements (such as `<span>` or `<div>`).
 
@@ -55,7 +55,7 @@ ___
 
 • `Optional` **ignoreElements**: string[]
 
-*Defined in index.ts:188*
+*Defined in [index.ts:188](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L188)*
 
 Ignore text contained within the specified dom nodes.
 Note that top level style/script tags are
@@ -68,7 +68,7 @@ ___
 
 • `Optional` **ignoreFilter**: undefined \| (node: INode, parent: INode \| undefined, prop: string \| undefined, index: number, ancestors: INode[]) => boolean
 
-*Defined in index.ts:194*
+*Defined in [index.ts:194](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L194)*
 
 Ignore text contained within the svelte ast nodes
 that match the filter.
@@ -80,7 +80,7 @@ ___
 
 • `Optional` **inline**: undefined \| false \| true
 
-*Defined in index.ts:141*
+*Defined in [index.ts:141](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L141)*
 
 Trims text adjacent to other elements/mustaches without a newline.
 Turns
@@ -98,7 +98,7 @@ ___
 
 • `Optional` **multiline**: undefined \| false \| true
 
-*Defined in index.ts:159*
+*Defined in [index.ts:159](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L159)*
 
 Trims text adjacent to other elements/mustaches when a newline is present.
 Turn
@@ -122,7 +122,7 @@ ___
 
 • `Optional` **mustacheBlockSiblings**: undefined \| false \| true
 
-*Defined in index.ts:175*
+*Defined in [index.ts:175](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L175)*
 
 Trims text adjacent to mustache blocks
 (such as `{#if boolean}{:else}{/if}`).
@@ -134,7 +134,7 @@ ___
 
 • `Optional` **mustacheDirectiveSiblings**: undefined \| false \| true
 
-*Defined in index.ts:181*
+*Defined in [index.ts:181](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L181)*
 
 Trims text adjacent to mustache @ directives
 (such as `{@html '<br/>'}{@debug someVar}`).
@@ -146,7 +146,7 @@ ___
 
 • `Optional` **mustacheTextSiblings**: undefined \| false \| true
 
-*Defined in index.ts:169*
+*Defined in [index.ts:169](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L169)*
 
 Trims text adjacent to mustache text expressions
 (such as `{someVar}`).
@@ -158,6 +158,6 @@ ___
 
 • `Optional` **removalMethod**: [RemovalMethod](../enums/removalmethod.md)
 
-*Defined in index.ts:129*
+*Defined in [index.ts:129](https://github.com/firefish5000/svelte-strip-whitespace/blob/9c88648/src/index.ts#L129)*
 
 How we should dispose of unwanted whitespace

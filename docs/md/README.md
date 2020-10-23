@@ -1,4 +1,4 @@
-**[svelte-stripper](README.md)**
+**[svelte-strip-whitespace](README.md)**
 
 > [Globals](globals.md)
 
@@ -29,7 +29,7 @@
 
 ▸ **sequentialPreprocessor**(...`preprocessorLists`: (PreprocessorGroup \| PreprocessorGroup[])[]): PreprocessorGroup
 
-*Defined in index.ts:489*
+*Defined in index.ts:493*
 
 Runs the passed preprocessors lists in sequence.
 Meaning All `markup`, `script`, and `style` preprocessors
@@ -49,12 +49,16 @@ ___
 
 ▸ **svelteStripper**(`passedOptions?`: [SvelteStripperOptions](interfaces/sveltestripperoptions.md)): PreprocessorGroup
 
-*Defined in index.ts:205*
+*Defined in index.ts:209*
 
 Strips unwanted whitespace out of svelte files.
 *Warning! Must be run on valid/pure svelte files!
-You can run other preprocessors first via the sequentia
-preprocessor*
+You can run other preprocessors first via the sequential
+preprocessor like so
+```js
+preprocess: sequentialPreprocessor(otherPreprocessors,svelteStripper())
+```
+*
 
 #### Parameters:
 

@@ -124,7 +124,7 @@ const enum RemovalMethod {
  * by an option with html comments
  * `<!-- -->`
  */
-interface SvelteStripperOptions {
+interface WhitespaceStripperOptions {
   /** How we should dispose of unwanted whitespace */
   removalMethod?: RemovalMethod
   /**
@@ -206,7 +206,7 @@ interface SvelteStripperOptions {
  * @param passedOptions config options
  */
 
-export function svelteStripper(passedOptions: SvelteStripperOptions = {
+export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
   removalMethod: RemovalMethod.Strip
   ,inline: false
   ,multiline: true
@@ -218,7 +218,7 @@ export function svelteStripper(passedOptions: SvelteStripperOptions = {
   ,ignoreElements: ['code' ,'pre' ,'style' ,'script']
   ,ignoreFilter: () => false
 }): PreprocessorGroup {
-  const options: Required<SvelteStripperOptions> = {
+  const options: Required<WhitespaceStripperOptions> = {
     removalMethod: RemovalMethod.Strip
     ,inline: false
     ,multiline: true
@@ -513,6 +513,8 @@ export function sequentialPreprocessor(...preprocessorLists: (PreprocessorGroup|
   }
 }
 
-function svelteStripperPreprocessor(preprocessors: PreprocessorGroup|PreprocessorGroup[] ,options?: SvelteStripperOptions) {
-  return sequentialPreprocessor(preprocessors ,svelteStripper(options))
+/*
+function svelteStripperPreprocessor(preprocessors: PreprocessorGroup|PreprocessorGroup[] ,options?: WhitespaceStripperOptions) {
+  return sequentialPreprocessor(preprocessors ,stripWhitespace(options))
 }
+*/
