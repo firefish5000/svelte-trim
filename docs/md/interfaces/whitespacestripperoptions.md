@@ -1,4 +1,4 @@
-**[svelte-strip-whitespace](../README.md)**
+**[svelte-strip-whitespace](../../../README.md)**
 
 > [Globals](../globals.md) / WhitespaceStripperOptions
 
@@ -31,40 +31,13 @@ by an option with html comments
 
 ## Properties
 
-### componentSiblings
-
-• `Optional` **componentSiblings**: undefined \| false \| true
-
-Trims text adjacent to components (such as `<Component>` and `<svelte:component>`).
-
 ___
 
-### elementSiblings
+### removalMethod
 
-• `Optional` **elementSiblings**: undefined \| false \| true
+• `Optional` **removalMethod**: [RemovalMethod](../enums/removalmethod.md)
 
-Trims text adjacent to elements (such as `<span>` or `<div>`).
-
-___
-
-### ignoreElements
-
-• `Optional` **ignoreElements**: string[]
-
-Ignore text contained within the specified dom nodes.
-Note that top level style/script tags are
-***always ignored*** and are thus not
-affected by this rule.
-
-___
-
-### ignoreFilter
-
-• `Optional` **ignoreFilter**: undefined \| (node: INode, parent: INode \| undefined, prop: string \| undefined, index: number, ancestors: INode[]) => boolean
-
-Ignore text contained within the svelte ast nodes
-that match the filter.
-Matches nothing by default.
+How we should dispose of unwanted whitespace
 
 ___
 
@@ -106,6 +79,43 @@ Into
 
 ___
 
+### componentSiblings
+
+• `Optional` **componentSiblings**: undefined \| false \| true
+
+Trims text adjacent to components (such as `<Component>` and `<svelte:component>`).
+
+___
+
+### elementSiblings
+
+• `Optional` **elementSiblings**: undefined \| false \| true
+
+Trims text adjacent to elements (such as `<span>` or `<div>`).
+
+___
+
+### ignoreElements
+
+• `Optional` **ignoreElements**: string[]
+
+Ignore text contained within the specified dom nodes.
+Note that top level style/script tags are
+***always ignored*** and are thus not
+affected by this rule.
+
+___
+
+### ignoreFilter
+
+• `Optional` **ignoreFilter**: undefined \| (node: INode, parent: INode \| undefined, prop: string \| undefined, index: number, ancestors: INode[]) => boolean
+
+Ignore text contained within the svelte ast nodes
+that match the filter.
+Matches nothing by default.
+
+___
+
 ### mustacheBlockSiblings
 
 • `Optional` **mustacheBlockSiblings**: undefined \| false \| true
@@ -134,10 +144,4 @@ Trims text adjacent to mustache text expressions
 (such as `{someVar}`).
 Defaults to false, treating it the same way as the escaped text content would have been.
 
-___
 
-### removalMethod
-
-• `Optional` **removalMethod**: [RemovalMethod](../enums/removalmethod.md)
-
-How we should dispose of unwanted whitespace

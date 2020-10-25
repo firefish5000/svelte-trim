@@ -3,46 +3,29 @@
 // Svelte fails to define default export's type, so we rebuild it.
 // @ts-expect-error walk is not in d.ts for some reason
 import { compile ,parse ,preprocess ,walk } from 'svelte/compiler'
-import { Ast ,TemplateNode } from 'svelte/types/compiler/interfaces'
-import { INode as NearINode } from 'svelte/types/compiler/compile/nodes/interfaces'
-import AwaitBlock from 'svelte/types/compiler/compile/nodes/AwaitBlock'
-import CatchBlock from 'svelte/types/compiler/compile/nodes/CatchBlock'
-import EachBlock from 'svelte/types/compiler/compile/nodes/EachBlock'
-import ElseBlock from 'svelte/types/compiler/compile/nodes/ElseBlock'
-import IfBlock from 'svelte/types/compiler/compile/nodes/IfBlock'
-import KeyBlock from 'svelte/types/compiler/compile/nodes/KeyBlock'
-import PendingBlock from 'svelte/types/compiler/compile/nodes/PendingBlock'
-import ThenBlock from 'svelte/types/compiler/compile/nodes/ThenBlock'
-import DebugTag from 'svelte/types/compiler/compile/nodes/DebugTag'
-import RawMustacheTag from 'svelte/types/compiler/compile/nodes/RawMustacheTag'
-import { PreprocessorGroup ,Processed } from 'svelte/types/compiler/preprocess'
+import { Ast } from 'svelte/types/compiler/interfaces'
+import type { INode as NearINode } from 'svelte/types/compiler/compile/nodes/interfaces'
+import type AwaitBlock from 'svelte/types/compiler/compile/nodes/AwaitBlock'
+import type CatchBlock from 'svelte/types/compiler/compile/nodes/CatchBlock'
+import type EachBlock from 'svelte/types/compiler/compile/nodes/EachBlock'
+import type ElseBlock from 'svelte/types/compiler/compile/nodes/ElseBlock'
+import type IfBlock from 'svelte/types/compiler/compile/nodes/IfBlock'
+import type KeyBlock from 'svelte/types/compiler/compile/nodes/KeyBlock'
+import type PendingBlock from 'svelte/types/compiler/compile/nodes/PendingBlock'
+import type ThenBlock from 'svelte/types/compiler/compile/nodes/ThenBlock'
+import type DebugTag from 'svelte/types/compiler/compile/nodes/DebugTag'
+import type RawMustacheTag from 'svelte/types/compiler/compile/nodes/RawMustacheTag'
+import type { PreprocessorGroup ,Processed } from 'svelte/types/compiler/preprocess'
 import type { SyncWalker } from 'estree-walker/types/sync'
-import Text from 'svelte/types/compiler/compile/nodes/Text'
+import type Text from 'svelte/types/compiler/compile/nodes/Text'
+import MagicString ,{ MagicStringOptions } from 'magic-string'
 
-/* interface Text extends NearText {
-  raw: string
-  start: number
-  end: number
-} */
 type INode = NearINode // Exclude<NearINode ,NearText> | Text
 
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 const svelte = {
   compile ,parse ,preprocess ,walk: walk as (ast:Ast ,walker:SyncWalker)=>void
-}
-
-function spliceSlice(str: string ,index: number ,count:number ,add:string) {
-  let newIndex = index
-  // We cannot pass negative indexes directly to the 2nd slicing operation.
-  if (newIndex < 0) {
-    newIndex = str.length + newIndex
-    if (newIndex < 0) {
-      newIndex = 0
-    }
-  }
-
-  return str.slice(0 ,newIndex) + (add || '') + str.slice(newIndex + count)
 }
 
 type BlockTypes = IfBlock | ElseBlock | EachBlock
@@ -85,35 +68,10 @@ function isNodeType<T extends INode ,K extends T['type'][] = T['type'][]>(node: 
 const enum RemovalMethod {
   /**
    * Remove the whitespace from the markup.
-   * Turns
-   * ```html
-   * <ul>
-   *   <li> some </li>
-   *   <li> words </li>
-   * </ul>
-   * ```
-   * Into
-   * ```html
-   * <ul><li> some </li><li> words </li></ul>
-   * ```
    */
-  Strip = 'strip'
+  Trim = 'trim'
   /**
    * Comment out the whitespace (preserves formatting/readability).
-   * Turn
-   * ```html
-   * <ul>
-   *   <li> some </li>
-   *   <li> words </li>
-   * </ul>
-   * ```
-   * Into
-   * ```html
-   * <ul><!--
-   *   --><li> some </li><!--
-   *   --><li> words </li><!--
-   * --></ul>
-   * ```
    */
   ,Comment = 'comment'
 }
@@ -129,32 +87,10 @@ interface WhitespaceStripperOptions {
   removalMethod?: RemovalMethod
   /**
    * Trims text adjacent to other elements/mustaches without a newline.
-   * Turns
-   * ```html
-   * <div> Text </div> <img src=""/> Text
-   * ```
-   * Into
-   * ```html
-   * <div> Text </div><!-- --><img src=""/><!-- -->Text
-   * ```
    */
   inline?: boolean
   /**
    * Trims text adjacent to other elements/mustaches when a newline is present.
-   * Turn
-   * ```html
-   * <ul>
-   *   <li> some <span> more </span> </li>
-   *   <li> words </li>
-   * </ul>
-   * ```
-   * Into
-   * ```html
-   * <ul><!--
-   *   --><li> some <span> more </span> </li><!--
-   *   --><li> words </li><!--
-   * --></ul>
-   * ```
    */
   multiline?: boolean
   /** Trims text adjacent to elements (such as `<span>` or `<div>`). */
@@ -195,18 +131,32 @@ interface WhitespaceStripperOptions {
 }
 
 /**
- * Strips unwanted whitespace out of svelte files.
- * *Warning! Must be run on valid/pure svelte files!
- * You can run other preprocessors first via the sequential
- * preprocessor like so*
+ * Removes unwanted whitespace out of svelte files.
+ *
+ * *Warning! Currently, we must be run on valid/pure svelte files!
+ * This means any other preprocessors you use must run before us.
+ * Due to how `svelte.preprocess` works, just placiing them before us will not be enough. You must additionaly wrap them in `svelte-as-markup-preprocessor`. See [their readme](https://github.com/firefish5000/svelte-as-markup-preprocessor#readme) for an explanation of why this is necessary.*
  * ```js
- * preprocess: sequentialPreprocessor(otherPreprocessors,stripWhitespace())
+ * // svelte.config.js
+ * const asMarkupPreprocessor = require('svelte-as-markup-preprocessor')
+ * const sveltePreprocess = requite('svlete-preprocess')
+ * const {mdsvex} = require('mdsvex')
+ * const svelteTrim = require('svelte-trim')
+ * module.exports = {
+ *   preprocess: [
+ *     asMarkupPreprocessor([
+ *       sveltePreprocess(),
+ *       mdsvex()
+ *     ]),
+ *     svelteTrim()
+ *   ]
+ * }
  * ```
  * @param passedOptions config options
  */
 
-export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
-  removalMethod: RemovalMethod.Strip
+export default function svelteTrim(passedOptions: WhitespaceStripperOptions = {
+  removalMethod: RemovalMethod.Trim
   ,inline: false
   ,multiline: true
   ,elementSiblings: true
@@ -218,7 +168,7 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
   ,ignoreFilter: () => false
 }): PreprocessorGroup {
   const options: Required<WhitespaceStripperOptions> = {
-    removalMethod: RemovalMethod.Strip
+    removalMethod: RemovalMethod.Trim
     ,inline: false
     ,multiline: true
     ,elementSiblings: true
@@ -232,9 +182,10 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
   Object.assign(options ,passedOptions)
   return {
     markup({ content ,filename }: {content:string ,filename:string}): Processed {
-      const trimmings: Set<Text> = new Set()
       const ancestors: INode[] = [] // new Set()
-
+      const ms = new MagicString(content ,{
+        filename
+      } as MagicStringOptions)
       svelte.walk(svelte.parse(content ,{ filename }) ,{
         // <ParentType extends INode | undefined = INode|undefined, PropType extends string | undefined = ParentType extends INode ? Exclude<keyof ParentType,keyof BaseNode | number | symbol> : undefined>(this: {skip():void}, node: INode, parent: ParentType, prop: PropType , index: number) {
         // @ts-expect-error enter is overriden
@@ -292,6 +243,19 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
             return
           }
 
+          // Ensure new mustache syntax hasn't been added/used
+          if (
+            // Ignore node if we know how to handle it.
+            !((node.type === 'MustacheTag')
+              || (atDirectiveTypes.includes(node.type as DirectiveTypes['type']))
+              || (blockTypes.includes(node.type as BlockTypes['type']))
+            )
+            // Match if we do not know how to handle it and it contains a mustache
+            && (content.substring(node.start ,node.end).startsWith('{'))
+          ) {
+            throw new Error(`Unsupported mustache syntax detected!\nNode type: ${JSON.stringify(node.type)}\nText: ${JSON.stringify(content.substring(node.start ,node.end))}\nAnscestors: ${JSON.stringify(ancestors.map((e) => e.type))}\nProp: ${prop}`)
+          }
+
           // TODO: Add a option to match container's tags. Currently treated the same as siblings.
           const hasParent = parent != null
           const parentIsBlock = blockTypes.includes(parent?.type as BlockTypes['type'])
@@ -326,15 +290,21 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
           const prevSiblingIsDirectiveTag = atDirectiveTypes.includes(prevSibling?.type as DirectiveTypes['type'])
 
           // TODO: I do not think there is ever a case where two Text nodes are side by side, but just in case
-          const nextSiblingIsText = nextSibling?.type === 'Text'
-          const prevSiblingIsText = prevSibling?.type === 'Text'
+          // const nextSiblingIsText = nextSibling?.type === 'Text'
+          // const prevSiblingIsText = prevSibling?.type === 'Text'
 
-          // Fix broken ast. Puts all whitespace
+          // Ast does something weird with whitespace inside of blocks.
+          // Treating it as part of the block tag if it has any non-text node children
+          // And treating it as part of the text child otherwise.
+          // The code block here always treats it as a text child
+          // To make the stripping code a bit more manageable.
+          // This only affects the markup of the `.svelte` file, not the
+          // generated dom.
           if (isNodeType<BlockTypes>(node ,blockTypes) && 'children' in node) {
             const openingTag = content.slice(node.start ,node.children?.[0]?.start ?? node.end)
             const closingTag = content.slice(node.children[node.children.length - 1]?.end ?? node.start ,node.end)
-            const openingWhitespace = openingTag.endsWith('}') ? '' : openingTag.match(/(?:\s*)$/)?.[0]
-            const closingWhitespace = closingTag.startsWith('{') ? '' : closingTag.match(/^(?:\s*)/)?.[0]
+            const openingWhitespace = openingTag.endsWith('}') ? '' : (/(?:\s*)$/).exec(openingTag)?.[0]
+            const closingWhitespace = closingTag.startsWith('{') ? '' : (/^(?:\s*)/).exec(closingTag)?.[0]
             if (openingWhitespace === undefined) throw new Error(`Error parsing opening tag ${JSON.stringify(openingTag)}`)
             if (closingWhitespace === undefined) throw new Error(`Error parsing closing tag ${JSON.stringify(closingTag)}`)
 
@@ -381,8 +351,6 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
           // Trim whitespace
           const inlineSpace = ' \f\t'
           const linebreakSpace = '\r\n'
-          // FIXME: Dont include nonbreaking space. (is there a reason we type this instead of html escape)
-          // const nonSpace = '\S'
           // FIXME: Option to Trim spaces inside of Text, such as those adjacent to nonbreaking whitespace
           // const nonbreakingWhitespace = '[]'
           if (node.type === 'Text') {
@@ -404,18 +372,19 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
               || (options.inline && RegExp(`^[${inlineSpace}]+(?:[^${linebreakSpace}]|$)`).test(node.raw))
             )) {
               const leadingSpaceRE = RegExp(`^([${inlineSpace}${linebreakSpace}]*)`)
-              if (options.removalMethod === 'strip') {
-                // @ts-expect-error `raw` property is missing from interface
-                node.raw = (node.raw as string).replace(leadingSpaceRE ,'')
+              // @ts-expect-error `raw` property is missing from interface
+              const leadingSpaceMatch = leadingSpaceRE.exec(node.raw as string)
+              const leadingSpaceLength: number = leadingSpaceMatch![0].length
+              if (options.removalMethod === RemovalMethod.Trim) {
+                ms.remove(node.start ,node.start + leadingSpaceLength)
               }
-              else if (options.removalMethod === 'comment') {
-                // @ts-expect-error `raw` property is missing from interface
-                node.raw = (node.raw as string).replace(leadingSpaceRE ,'<!--$1-->')
+              else if (options.removalMethod === RemovalMethod.Comment) {
+                ms.appendLeft(node.start ,'<!--')
+                ms.appendLeft(node.start + leadingSpaceLength ,'-->')
               }
               else {
                 throw new Error(`Failed to handel removalMethod: ${JSON.stringify(options.removalMethod)}`)
               }
-              trimmings.add(node)
             }
             if (trimTrailingEnabled && (
               // @ts-expect-error `raw` property is missing from interface
@@ -424,7 +393,10 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
               || (options.inline && RegExp(`(?:^|[^${linebreakSpace}])[${inlineSpace}]+$`).test(node.raw))
             )) {
               const trailingSpaceRE = RegExp(`([${inlineSpace}${linebreakSpace}]*)$`)
-              if (options.removalMethod === RemovalMethod.Strip) {
+              // @ts-expect-error `raw` property is missing from interface
+              const trailingSpaceMatch = trailingSpaceRE.exec(node.raw as string)
+              const trailingSpaceLength: number = trailingSpaceMatch![0].length
+              if (options.removalMethod === RemovalMethod.Trim) {
                 // @ts-expect-error `raw` property is missing from interface
                 node.raw = (node.raw as string).replace(trailingSpaceRE ,'')
               }
@@ -435,73 +407,28 @@ export function stripWhitespace(passedOptions: WhitespaceStripperOptions = {
               else {
                 throw new Error(`Failed to handel removalMethod: ${JSON.stringify(options.removalMethod)}`)
               }
-              trimmings.add(node)
+              if (options.removalMethod === RemovalMethod.Trim) {
+                ms.remove(node.end - trailingSpaceLength ,node.end)
+              }
+              else if (options.removalMethod === RemovalMethod.Comment) {
+                ms.appendLeft(node.end - trailingSpaceLength ,'<!--')
+                ms.appendLeft(node.end ,'-->')
+              }
             }
-          }
-          // Ensure new mustache syntax hasn't been added/used
-          else if (node.type === 'MustacheTag') {
-            // handled
-          }
-          else if (atDirectiveTypes.includes(node.type as DirectiveTypes['type'])) {
-            // handled
-          }
-          else if (blockTypes.includes(node.type as BlockTypes['type'])) {
-            // handled
-          }
-          else if (content.substring(node.start ,node.end).startsWith('{')) {
-            throw new Error(`Unsupported mustache syntax detected!\nNode type: ${JSON.stringify(node.type)}\nText: ${JSON.stringify(content.substring(node.start ,node.end))}\nAnscestors: ${JSON.stringify(ancestors.map((e) => e.type))}\nProp: ${prop}`)
           }
           ancestors.push(node)
         }
-        ,leave(node) {
+        ,leave() {
           if (ancestors.length < 1) {
             throw new Error('Attempted to leave a node not in the ancestor list!')
           }
           ancestors.pop()
         }
       })
-      let newCode = content
-      for (const node of Array.from(trimmings).reverse()) {
-        // @ts-expect-error `raw` property is missing from interface
-        newCode = spliceSlice(newCode ,node.start ,node.end - node.start ,node.raw)
+      return {
+        code: ms.toString()
+        ,map: ms.generateMap({ hires: true })
       }
-      return { code: newCode }
     }
   }
 }
-
-/**
- * Runs the passed preprocessors lists in sequence.
- * Meaning All `markup`, `script`, and `style` preprocessors
- * of group 1 will run before any preprocessor of group 2.
- * @param preprocessorLists The preprocessors to run. Each group will invoke `svelte.preprocess()` witht the preprocessed output of the previous group.
- */
-
-export function sequentialPreprocessor(...preprocessorLists: (PreprocessorGroup|PreprocessorGroup[])[]): PreprocessorGroup {
-  return {
-    async markup({ content ,filename }): Promise<Processed> {
-      const result: {code:string ,dependencies: string[]} = {
-        code: content ,dependencies: []
-      }
-      for (const preprocessors of preprocessorLists) {
-        if (preprocessors != null) {
-          // eslint-disable-next-line no-await-in-loop
-          const newResult = await svelte.preprocess(
-            result.code
-            ,preprocessors
-            ,{ filename }
-          )
-          result.code = newResult.code
-          result.dependencies = [...result.dependencies ,...newResult.dependencies as string[]]
-        }
-      }
-      return result
-    }
-  }
-}
-
-/*
-function svelteStripperPreprocessor(preprocessors: PreprocessorGroup|PreprocessorGroup[] ,options?: WhitespaceStripperOptions) {
-  return sequentialPreprocessor(preprocessors ,stripWhitespace(options))
-}
-*/

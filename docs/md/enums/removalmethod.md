@@ -1,4 +1,4 @@
-**[svelte-strip-whitespace](../README.md)**
+**[svelte-strip-whitespace](../../../README.md)**
 
 > [Globals](../globals.md) / RemovalMethod
 
@@ -21,9 +21,9 @@ How we dispose of unwanted whitespace
 
 ___
 
-### Strip
+### Trim
 
-•  **Strip**:  = "strip"
+•  **Trim**:  = "trim"
 
 Remove the whitespace from the markup.
 Turns
