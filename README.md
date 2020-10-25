@@ -21,7 +21,11 @@ module.exports = {
       sveltePreprocess(),
       mdsvex()
     ]),
-    svelteTrim()
+    svelteTrim({
+      removalMethod: 'trim'
+      multiline: true,
+      inline: false
+    })
   ]
 }
 ```

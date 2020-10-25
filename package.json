@@ -25,6 +25,11 @@
   ],
   "author": "firefish5000",
   "license": "ISC",
+  "homepage": "https://github.com/firefish5000/svelte-trim#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firefish5000/svelte-trim.git"
+  },
   "devDependencies": {
     "@tdi/eslint-config-base": "0.0.9",
     "@types/estree": "0.0.45",
