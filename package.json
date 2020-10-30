@@ -1,8 +1,13 @@
 {
   "name": "svelte-trim",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Removes unwanted whitespace from the markup section of svelte files.",
-  "main": "out/index.js",
+  "main": "out/cjs/index.js",
+  "module": "out/esm/index.js",
+  "exports": {
+    "import": "./out/esm/index.js",
+    "require": "./out/cjs/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "run-p preprocess",
@@ -12,7 +17,9 @@
     "clean": "run-p clean:preprocessed",
     "clean:preprocessed": "if [ -d \"./out\" ] ; then rm -r \"./out\"; fi",
     "preprocess": "run-s clean:preprocessed preprocess:typescript",
-    "preprocess:typescript": "tsc",
+    "preprocess:typescript": "run-p preprocess:typescript:esm preprocess:typescript:cjs",
+    "preprocess:typescript:esm": "tsc --module ESNext --outDir \"./out/esm/\"",
+    "preprocess:typescript:cjs": "tsc",
     "prepare": "npm run build",
     "prepublishOnly": "run-p check"
   },
@@ -31,7 +38,7 @@
     "url": "https://github.com/firefish5000/svelte-trim.git"
   },
   "devDependencies": {
-    "@tdi/eslint-config-base": "0.0.9",
+    "@tdi/eslint-config-base": "^0.1.1",
     "@types/estree": "0.0.45",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
@@ -48,7 +55,7 @@
   "peerDependencies": {
     "svelte": "^3.29"
   },
-  "types": "./out/index.d.ts",
+  "types": "./out/esm/index.d.ts",
   "dependencies": {
     "magic-string": "^0.25.7"
   }

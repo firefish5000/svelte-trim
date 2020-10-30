@@ -155,7 +155,7 @@ interface WhitespaceStripperOptions {
  * @param passedOptions config options
  */
 
-export default function svelteTrim(passedOptions: WhitespaceStripperOptions = {
+export function svelteTrim(passedOptions: WhitespaceStripperOptions = {
   removalMethod: RemovalMethod.Trim
   ,inline: false
   ,multiline: true

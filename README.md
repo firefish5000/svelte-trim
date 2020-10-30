@@ -11,10 +11,10 @@ This means any other preprocessors you use must run before us.
 Due to how `svelte.preprocess` works, just placiing them before us will not be enough. You must additionaly wrap them in `svelte-as-markup-preprocessor`. See [their readme](https://github.com/firefish5000/svelte-as-markup-preprocessor#readme) for an explanation of why this is necessary.*
 ```js
 // svelte.config.js
-const asMarkupPreprocessor = require('svelte-as-markup-preprocessor')
-const sveltePreprocess = requite('svlete-preprocess')
+const {asMarkupPreprocessor} = require('svelte-as-markup-preprocessor')
+const sveltePreprocess = require('svelte-preprocess')
 const {mdsvex} = require('mdsvex')
-const svelteTrim = require('svelte-trim')
+const {svelteTrim} = require('svelte-trim')
 module.exports = {
   preprocess: [
     asMarkupPreprocessor([
